@@ -18,4 +18,19 @@ enum TaskStatuses: int
             default => 'To Do',
         };
     }
+
+    public static function getColumns(): array
+    {
+        $columns = [];
+
+        foreach (self::cases() as $case) {
+            $columns[] = [
+                'id' => $case->value,
+                'title' => $case->label(),
+                'tasks' => [],
+            ];
+        }
+
+        return $columns;
+    }
 }

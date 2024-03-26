@@ -18,8 +18,11 @@ class TaskResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'developer' => new DeveloperResource($this->whenLoaded('developer')),
+            'status' => $this->status,
+            'status_text' => $this->status_text,
             'duration' => $this->duration,
             'difficulty' => $this->difficulty,
+            'humanized_created_at' => $this->created_at->format('d.m.Y'),
         ];
     }
 }

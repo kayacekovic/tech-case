@@ -2,4 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/todos', \App\Http\Controllers\Api\V1\GetTaskListAction::class);
+Route::prefix('v1')->group(function () {
+    Route::get('/tasks', \App\Http\Controllers\Api\V1\GetTaskListAction::class);
+});
