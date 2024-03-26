@@ -9,7 +9,7 @@
     }
 
     .task-column .task-list {
-        @apply h-[calc(100vh-14rem)] overflow-y-auto;
+        @apply h-[calc(100vh-14rem)] overflow-y-auto space-y-4;
     }
 
     .task-column .task-list .task-card {

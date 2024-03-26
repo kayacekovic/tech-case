@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Task;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -21,5 +22,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call(DeveloperSeeder::class);
+
+        Task::factory(100)->create();
     }
 }
