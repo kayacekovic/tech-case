@@ -12,7 +12,7 @@ class Developer extends Model
     use HasFactory;
     use SoftDeletes;
 
-    public function todos(): HasMany
+    public function tasks(): HasMany
     {
         return $this->hasMany(Task::class);
     }

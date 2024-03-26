@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Enums\TaskStatuses;
 use App\Models\Developer;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,12 +23,17 @@ class TaskFactory extends Factory
             ->inRandomOrder()
             ->first();
 
+        $duration = rand(1, 24);
+        $createdAt = fake()->dateTimeBetween('now', '+4 weeks');
+
         return [
             'title' => fake()->realText(90),
             'developer_id' => optional($developer)->id,
             'status' => fake()->randomElement(TaskStatuses::values()),
-            'duration' => rand(1, 24),
+            'duration' => $duration,
             'difficulty' => rand(1, 5),
+            'due_date' => Carbon::parse($createdAt)->addHours($duration),
+            'created_at' => $createdAt,
         ];
     }
 }

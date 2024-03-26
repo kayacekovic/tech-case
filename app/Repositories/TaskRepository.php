@@ -13,11 +13,30 @@ class TaskRepository
         return Task::query()->find($taskId);
     }
 
+    public function getLastTaskByDueDate(): ?Task
+    {
+        return Task::query()
+            ->orderByDesc('due_date')
+            ->first();
+    }
+
     public function get(): Collection
     {
         return Task::query()
             ->with(['developer' => fn ($q) => $q->select('id', 'name')])
             ->get();
+    }
+
+    public function getUnassignedTasks(): Collection
+    {
+        return Task::query()
+            ->whereNull('developer_id')
+            ->get();
+    }
+
+    public function count(): int
+    {
+        return Task::query()->count();
     }
 
     public function create(TaskData $data): Task

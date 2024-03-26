@@ -15,8 +15,8 @@ class GetTaskListAction extends Controller
 
     public function __invoke(): AnonymousResourceCollection
     {
-        $todos = $this->taskRepository->get();
+        $tasks = $this->taskRepository->get();
 
-        return TaskResource::collection($todos);
+        return TaskResource::collection($tasks);
     }
 }

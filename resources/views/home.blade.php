@@ -13,15 +13,15 @@
             <dl class="mt-5 grid grid-cols-1 lg:gap-x-8 gap-x-4 sm:grid-cols-3">
                 <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
                     <dt class="truncate text-sm font-medium text-gray-500">Total Tasks</dt>
-                    <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">71,897</dd>
+                    <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900" v-text="stats.tasks_count"></dd>
                 </div>
                 <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
-                    <dt class="truncate text-sm font-medium text-gray-500">Total Sprints</dt>
-                    <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">58.16%</dd>
+                    <dt class="truncate text-sm font-medium text-gray-500">Total Developers</dt>
+                    <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900" v-text="stats.developers_count"></dd>
                 </div>
                 <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
                     <dt class="truncate text-sm font-medium text-gray-500">Estimated All Tasks Due Date</dt>
-                    <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">24.57%</dd>
+                    <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900" v-text="stats.estimated_all_tasks_due_date"></dd>
                 </div>
             </dl>
         </div>
@@ -75,11 +75,13 @@
             data() {
                 return {
                     columns: @js(\App\Enums\TaskStatuses::getColumns()),
+                    stats: {},
                 }
             },
             async mounted() {
-                const tasks = await this.getTasks();
+                this.stats = await this.getTasksStats();
 
+                const tasks = await this.getTasks();
                 for (let task of tasks) {
                     let columnIndex = this.columns.findIndex(column => column.id === task.status);
 
@@ -89,7 +91,10 @@
             methods: {
                 async getTasks() {
                     return (await axios.get('/api/v1/tasks')).data.data;
-                }
+                },
+                async getTasksStats() {
+                    return (await axios.get('/api/v1/tasks/stats')).data;
+                },
             }
         }).mount('#app')
     </script>

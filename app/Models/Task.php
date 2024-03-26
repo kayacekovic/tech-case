@@ -15,6 +15,7 @@ class Task extends Model
 
     protected $casts = [
         'status' => TaskStatuses::class,
+        'due_date' => 'datetime',
     ];
 
     public function developer(): BelongsTo

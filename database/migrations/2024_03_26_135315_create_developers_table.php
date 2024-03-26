@@ -15,6 +15,7 @@ return new class() extends Migration {
             $table->string('name');
             $table->integer('difficulty_level');
             $table->integer('task_complete_duration');
+            $table->integer('weekly_work_hour')->default(45);
             $table->timestamps();
             $table->softDeletes();
         });

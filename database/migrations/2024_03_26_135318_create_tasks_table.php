@@ -17,7 +17,7 @@ return new class() extends Migration {
             $table->integer('status');
             $table->integer('duration');
             $table->integer('difficulty');
-            $table->dateTime('due_date');
+            $table->dateTime('due_date')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
