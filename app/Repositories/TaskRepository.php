@@ -67,6 +67,8 @@ class TaskRepository
         $task->status = $data->status;
         $task->duration = $data->duration;
         $task->difficulty = $data->difficulty;
+        $task->due_date = $data->dueDate;
+        $task->provider = $data->provider;
         $task->save();
 
         return $task;
@@ -79,6 +81,7 @@ class TaskRepository
         $task->status = $data->status;
         $task->duration = $data->duration;
         $task->difficulty = $data->difficulty;
+        $task->due_date = $data->dueDate;
 
         return $task;
     }

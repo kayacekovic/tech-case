@@ -23,6 +23,6 @@ class DatabaseSeeder extends Seeder
 
         $this->call(DeveloperSeeder::class);
 
-        Task::factory(100)->create();
+//        Task::factory(100)->create();
     }
 }

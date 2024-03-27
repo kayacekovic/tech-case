@@ -37,7 +37,7 @@ class AssignTasksToDevelopersCommand extends Command
         DeveloperRepository $developerRepository,
         SprintRepository $sprintRepository,
         TaskRepository $taskRepository,
-    ) {
+    ): int {
         $tasks = $taskRepository->getUnassignedTasks();
         $developers = $developerRepository->getDevelopersForTaskAssigment();
 
@@ -92,5 +92,7 @@ class AssignTasksToDevelopersCommand extends Command
         }
 
         $bar->finish();
+
+        return Command::SUCCESS;
     }
 }
