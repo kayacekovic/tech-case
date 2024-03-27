@@ -4,15 +4,11 @@
 
 
 @layer components {
-    .task-column {
-        @apply w-80 min-w-[320px] bg-gray-200 rounded-lg px-3 py-3 rounded;
+    .task-list {
+        @apply flex flex-wrap lg:gap-8 gap-4;
     }
 
-    .task-column .task-list {
-        @apply h-[calc(100vh-14rem)] overflow-y-auto space-y-4;
-    }
-
-    .task-column .task-list .task-card {
-        @apply relative bg-white shadow rounded pl-3 pr-7 pt-3 pb-5 border border-white;
+    .task-list .task-card {
+        @apply w-80 relative bg-white shadow rounded p-3 pb-5 border border-white;
     }
 }

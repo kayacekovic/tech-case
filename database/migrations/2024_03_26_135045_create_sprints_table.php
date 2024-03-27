@@ -10,12 +10,13 @@ return new class() extends Migration {
      */
     public function up(): void
     {
-        Schema::create('developers', function (Blueprint $table) {
+        Schema::create('sprints', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->integer('ability_level');
-            $table->integer('task_complete_duration');
-            $table->integer('weekly_work_hour')->default(45);
+            $table->integer('order_num');
+            $table->dateTime('start_date');
+            $table->dateTime('end_date');
+            $table->boolean('is_active');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -26,6 +27,6 @@ return new class() extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('developers');
+        Schema::dropIfExists('sprints');
     }
 };

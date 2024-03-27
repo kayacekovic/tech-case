@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Data\TaskData;
 use App\Models\Task;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 class TaskRepository
@@ -20,10 +21,21 @@ class TaskRepository
             ->first();
     }
 
-    public function get(): Collection
+    public function get(int $sprintId = null, int $developerId = null): Collection
     {
         return Task::query()
-            ->with(['developer' => fn ($q) => $q->select('id', 'name')])
+            ->with([
+                'currentSprint',
+                'developer' => fn ($q) => $q->select('id', 'name'),
+            ])
+            ->when($sprintId, function (Builder $q) use ($sprintId) {
+                $q->whereRelation('sprints', 'id', $sprintId);
+            })
+            ->when($developerId, function (Builder $q) use ($developerId) {
+                $q->where('developer_id', $developerId);
+            })
+            ->orderBy('created_at')
+            ->orderBy('due_date')
             ->get();
     }
 
@@ -31,12 +43,20 @@ class TaskRepository
     {
         return Task::query()
             ->whereNull('developer_id')
+            ->orderByDesc('difficulty')
             ->get();
     }
 
     public function count(): int
     {
         return Task::query()->count();
+    }
+
+    public function assignedTasksCount(): int
+    {
+        return Task::query()
+            ->whereNotNull('developer_id')
+            ->count();
     }
 
     public function create(TaskData $data): Task

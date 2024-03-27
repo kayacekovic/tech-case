@@ -17,12 +17,13 @@ class TaskResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
+            'sprint' => new SprintResource($this->whenLoaded('currentSprint')),
             'developer' => new DeveloperResource($this->whenLoaded('developer')),
             'status' => $this->status,
             'status_text' => $this->status->label(),
             'duration' => $this->duration,
             'difficulty' => $this->difficulty,
-            'humanized_created_at' => $this->created_at->format('d.m.Y'),
+            'humanized_due_date' => optional($this->due_date)->format('d/m/Y H:i'),
         ];
     }
 }

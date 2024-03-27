@@ -3,8 +3,9 @@
 namespace App\Data;
 
 use App\Enums\TaskStatuses;
+use Spatie\LaravelData\Data;
 
-class TaskData
+class TaskData extends Data
 {
     public function __construct(
         public string $title,

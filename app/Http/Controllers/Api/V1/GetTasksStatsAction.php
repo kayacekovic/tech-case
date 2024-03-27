@@ -9,24 +9,21 @@ use Illuminate\Http\JsonResponse;
 
 class GetTasksStatsAction extends Controller
 {
-    public function __construct(
-        protected readonly TaskRepository $taskRepository,
-        protected readonly DeveloperRepository $developerRepository,
-    ) {
+    public function __construct(protected readonly TaskRepository $taskRepository) {
     }
 
     public function __invoke(): JsonResponse
     {
         $tasksCount = $this->taskRepository->count();
-        $developersCount = $this->developerRepository->count();
+        $assignedTasksCount = $this->taskRepository->assignedTasksCount();
 
         $lastTaskByDueDate = $this->taskRepository->getLastTaskByDueDate();
         $dueDate = optional($lastTaskByDueDate)->due_date;
 
         return response()->json([
             'tasks_count' => $tasksCount,
-            'developers_count' => $developersCount,
-            'estimated_all_tasks_due_date' => optional($dueDate)->format('d.m.Y'),
+            'assigned_tasks_count' => $assignedTasksCount,
+            'estimated_all_tasks_due_date' => optional($dueDate)->format('d/m/Y'),
         ]);
     }
 }

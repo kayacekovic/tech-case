@@ -13,6 +13,7 @@ return new class() extends Migration {
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('developer_id')->nullable()->constrained();
+            $table->foreignId('current_sprint_id')->nullable()->constrained('sprints');
             $table->string('title', 255);
             $table->integer('status');
             $table->integer('duration');

@@ -15,27 +15,27 @@ class DeveloperSeeder extends Seeder
         $developers = [
             [
                 'name' => 'DEV1',
-                'difficulty_level' => 1,
+                'ability_level' => 1,
                 'task_complete_duration' => 1,
             ],
             [
                 'name' => 'DEV2',
-                'difficulty_level' => 2,
+                'ability_level' => 2,
                 'task_complete_duration' => 1,
             ],
             [
                 'name' => 'DEV3',
-                'difficulty_level' => 3,
+                'ability_level' => 3,
                 'task_complete_duration' => 1,
             ],
             [
                 'name' => 'DEV4',
-                'difficulty_level' => 4,
+                'ability_level' => 4,
                 'task_complete_duration' => 1,
             ],
             [
                 'name' => 'DEV5',
-                'difficulty_level' => 5,
+                'ability_level' => 5,
                 'task_complete_duration' => 1,
             ],
         ];

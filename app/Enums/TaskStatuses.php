@@ -23,19 +23,4 @@ enum TaskStatuses: int
     {
         return array_column(self::cases(), 'value');
     }
-
-    public static function getColumns(): array
-    {
-        $columns = [];
-
-        foreach (self::cases() as $case) {
-            $columns[] = [
-                'id' => $case->value,
-                'title' => $case->label(),
-                'tasks' => [],
-            ];
-        }
-
-        return $columns;
-    }
 }
