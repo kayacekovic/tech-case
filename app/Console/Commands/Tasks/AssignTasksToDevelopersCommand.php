@@ -55,10 +55,10 @@ class AssignTasksToDevelopersCommand extends Command
         $totalUnassignedTasksCount = $unassignedTasks->count();
         $assignedTasks = $sprint->tasks()->get();
 
-        /* @var Task $task */
         do {
             $unassignedTasks = $unassignedTasks->whereNotIn('id', $assignedTasks->pluck('id'));
 
+            /* @var Task $task */
             foreach ($unassignedTasks as $task) {
                 $developersHaveEffortForSprint = $developers->reject(function (Developer $developer) use ($assignedTasks, $sprint) {
                     $totalEffort = $this->sprintService->getDeveloperTotalEffortForSprint($assignedTasks, $developer, $sprint);
