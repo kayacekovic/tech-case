@@ -28,70 +28,79 @@ class AssignTasksToDevelopersCommand extends Command
      */
     protected $description = 'Assign all tasks to developers.';
 
+    public function __construct(
+        private readonly TaskAssigmentService $taskAssigmentService,
+        private readonly SprintService $sprintService,
+        private readonly DeveloperRepository $developerRepository,
+        private readonly SprintRepository $sprintRepository,
+        private readonly TaskRepository $taskRepository,
+    ) {
+        parent::__construct();
+    }
+
     /**
      * Execute the console command.
      */
-    public function handle(
-        TaskAssigmentService $taskAssigmentService,
-        SprintService $sprintService,
-        DeveloperRepository $developerRepository,
-        SprintRepository $sprintRepository,
-        TaskRepository $taskRepository,
-    ): int {
-        $tasks = $taskRepository->getUnassignedTasks();
-        $developers = $developerRepository->getDevelopersForTaskAssigment();
+    public function handle(): int
+    {
+        $unassignedTasks = $this->taskRepository->getUnassignedTasks();
+        $developers = $this->developerRepository->getDevelopersForTaskAssigment();
 
-        $sprint = $sprintRepository->getActiveSprint();
+        $sprint = $this->sprintRepository->getActiveSprint();
         if (!$sprint) {
-            $sprintStartDate = $sprintService->findSprintStartDate(Carbon::now());
-            $sprint = $sprintService->createNewSprint($sprintStartDate, true);
+            $sprintStartDate = $this->sprintService->findSprintStartDate(Carbon::now());
+            $sprint = $this->sprintService->createNewSprint($sprintStartDate, true);
         }
 
+        $totalUnassignedTasksCount = $unassignedTasks->count();
         $assignedTasks = $sprint->tasks()->get();
 
-        $bar = $this->output->createProgressBar($tasks->count());
-        $bar->start();
+        /* @var Task $task */
+        do {
+            $unassignedTasks = $unassignedTasks->whereNotIn('id', $assignedTasks->pluck('id'));
 
-        /** @var Task $task */
-        foreach ($tasks as $task) {
-            $totalEffortForCurrentSprint = $assignedTasks->where('current_sprint_id', $sprint->id)
-                ->sum('effort');
-            $availableEffortForCurrentSprint = $sprintService->getDevelopersAvailableEffortForSprint($developers, $sprint);
+            foreach ($unassignedTasks as $task) {
+                $developersHaveEffortForSprint = $developers->reject(function (Developer $developer) use ($assignedTasks, $sprint) {
+                    $totalEffort = $this->sprintService->getDeveloperTotalEffortForSprint($assignedTasks, $developer, $sprint);
+                    $totalEffort = round($totalEffort / 5) * 5;
 
-            if ($totalEffortForCurrentSprint >= $availableEffortForCurrentSprint) {
-                $sprintStartDate = $sprintService->findSprintStartDate($sprint->end_date->addDays(1));
-                $sprint = $sprintService->createNewSprint($sprintStartDate);
-            }
+                    return $totalEffort >= $developer->weekly_work_hour;
+                });
 
-            /** @var Developer $developer */
-            foreach ($developers as $developer) {
-                $totalDeveloperEffortForCurrentSprint = $assignedTasks->where('developer_id', $developer->id)
-                    ->where('current_sprint_id', $sprint->id)
-                    ->sum('effort');
-
-                $availableDeveloperEffortForCurrentSprint = $developer->getAvailableEffortForSprint($sprint);
-                if ($totalDeveloperEffortForCurrentSprint >= $availableDeveloperEffortForCurrentSprint) {
-                    continue;
+                if (!$developersHaveEffortForSprint->count()) {
+                    $sprintStartDate = $this->sprintService->findSprintStartDate($sprint->end_date->addDays(1));
+                    $sprint = $this->sprintService->createNewSprint($sprintStartDate);
                 }
 
-                $developerEffortForTask = $task->effort / $developer->ability_level;
-                $developerLastAssignedTask = $assignedTasks->where('developer_id', $developer->id)->last();
+                /** @var Developer $developer */
+                foreach ($developers as $developer) {
+                    $developerEffortForTask = $this->sprintService->getDeveloperEffortForTask($developer, $task);
+                    $developerTotalEffort = $this->sprintService->getDeveloperTotalEffortForSprint($assignedTasks, $developer, $sprint);
 
-                $startDate = $developerLastAssignedTask->due_date ?? Carbon::now();
-                $dueDate = $taskAssigmentService->findDueDate($startDate, $developerEffortForTask);
+                    $developerTotalEffort += $developerEffortForTask;
 
-                $assignedTask = $taskAssigmentService->assignTask($task, $developer, $sprint, $dueDate);
+                    if ($developerTotalEffort >= $developer->weekly_work_hour) {
+                        continue;
+                    }
 
-                $assignedTask->current_sprint_id = $sprint->id;
-                $assignedTasks->push($assignedTask);
+                    $developerLastAssignedTask = $assignedTasks->where('developer_id', $developer->id)->last();
 
-                break;
+                    $startDate = optional($developerLastAssignedTask)->due_date ?? $sprint->start_date;
+                    if (optional($developerLastAssignedTask)->current_sprint_id !== $sprint->id) {
+                        $startDate = $sprint->start_date;
+                    }
+
+                    $dueDate = $this->taskAssigmentService->findDueDate($startDate, $developerEffortForTask);
+
+                    $assignedTask = $this->taskAssigmentService->assignTask($task, $developer, $sprint, $dueDate);
+                    $assignedTasks->push($assignedTask);
+
+                    --$totalUnassignedTasksCount;
+
+                    break;
+                }
             }
-
-            $bar->advance();
-        }
-
-        $bar->finish();
+        } while ($totalUnassignedTasksCount > 0);
 
         return Command::SUCCESS;
     }

@@ -37,42 +37,55 @@ class TaskAssigmentService
         $workingStartTime = WorkingHours::START_HOUR->value;
         $workingEndTime = WorkingHours::END_HOUR->value;
 
-        $date = $startDate;
+        $dueDate = (clone $startDate);
         if ($startDate->isWeekend()) {
-            $date->next(Carbon::MONDAY)
+            $dueDate->next(Carbon::MONDAY)
                 ->setHour($workingStartTime)
                 ->setMinute(0)
                 ->setSecond(0);
-        } elseif ($startDate->hour > $workingEndTime) {
-            $date->addDays()
+        } elseif ($startDate->hour >= $workingEndTime) {
+            $dueDate->addDays()
                 ->setHour($workingStartTime)
                 ->setMinute(0)
                 ->setSecond(0);
         } elseif ($startDate->hour < $workingStartTime) {
-            $date->setHour($workingStartTime)
+            $dueDate->setHour($workingStartTime)
                 ->setMinute(0)
                 ->setSecond(0);
         }
 
-        $date->addHours($developerEffort);
+        $dueDate->addHours($developerEffort);
 
         do {
-            $isValidDueDate = ($date->hour >= $workingStartTime && $date->hour < $workingEndTime);
+            $dueDateHour = $dueDate->hour;
+            if (0 === $dueDateHour) {
+                $dueDateHour = 24;
+            }
+
+            $isValidDueDate = ($dueDateHour >= $workingStartTime && $dueDateHour <= $workingEndTime);
 
             if (!$isValidDueDate) {
-                $overTime = $date->hour - $workingEndTime;
+                $overTime = $dueDateHour - $workingEndTime;
 
-                $date->addDays()
+                $dueDate->addDays()
                     ->setHour($workingStartTime + $overTime)
                     ->setMinute(0)
                     ->setSecond(0);
             }
 
-            if ($date->isWeekend()) {
-                $date->next(Carbon::MONDAY);
+            if ($dueDate->isWeekend()) {
+                $dueDateHour = $workingStartTime;
+                if (isset($overTime)) {
+                    $dueDateHour += $overTime;
+                }
+
+                $dueDate->next(Carbon::MONDAY)
+                    ->setHour($dueDateHour)
+                    ->setMinute(0)
+                    ->setSecond(0);
             }
         } while (!$isValidDueDate);
 
-        return $date;
+        return $dueDate;
     }
 }

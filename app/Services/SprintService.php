@@ -6,6 +6,7 @@ use App\Data\SprintData;
 use App\Enums\WorkingHours;
 use App\Models\Developer;
 use App\Models\Sprint;
+use App\Models\Task;
 use App\Repositories\SprintRepository;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -38,6 +39,10 @@ class SprintService
 
     public function findSprintStartDate(Carbon $startDate): Carbon
     {
+        if ($startDate->hour > WorkingHours::END_HOUR->value && $startDate->hour <= 23) {
+            $startDate->addDays();
+        }
+
         if ($startDate->isWeekend()) {
             $startDate->next(Carbon::MONDAY);
         }
@@ -47,10 +52,18 @@ class SprintService
             ->setSecond(0);
     }
 
-    public function getDevelopersAvailableEffortForSprint(Collection $developers, Sprint $sprint)
+    public function getDeveloperEffortForTask(Developer $developer, Task $task)
     {
-        return $developers->reduce(function (int $carry, Developer $developer) use ($sprint) {
-            return $carry + $developer->getAvailableEffortForSprint($sprint);
+        return round(($task->difficulty / $developer->ability_level) * $task->duration);
+    }
+
+    public function getDeveloperTotalEffortForSprint(Collection $assignedTasks, Developer $developer, Sprint $sprint)
+    {
+        $tasks = $assignedTasks->where('developer_id', $developer->id)
+            ->where('current_sprint_id', $sprint->id);
+
+        return $tasks->reduce(function (int $carry, Task $task) use ($developer) {
+            return $carry + $this->getDeveloperEffortForTask($developer, $task);
         }, 0);
     }
 }

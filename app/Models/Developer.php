@@ -53,9 +53,4 @@ class Developer extends Model
 
         return $workHour;
     }
-
-    public function getAvailableEffortForSprint(Sprint $sprint): int
-    {
-        return $this->getAvailableWorkHourForSprint($sprint) * $this->ability_level;
-    }
 }
