@@ -1,6 +1,9 @@
 Case Study
 ---
 
+## Overview
+It assigns the tasks drawn from the providers to the developers as soon as possible according to the weekly working days and hours.
+
 ### Installation
 
 - Clone the project to local repository.
