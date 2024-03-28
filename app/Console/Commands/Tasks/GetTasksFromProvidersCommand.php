@@ -4,7 +4,7 @@ namespace App\Console\Commands\Tasks;
 
 use App\Enums\TaskProviders;
 use App\Repositories\TaskRepository;
-use App\Services\TaskProviders\TaskProviderService;
+use App\Services\TaskProviders\TaskProviderServiceInterface;
 use Illuminate\Console\Command;
 
 class GetTasksFromProvidersCommand extends Command
@@ -31,8 +31,7 @@ class GetTasksFromProvidersCommand extends Command
         if ($this->option('provider')) {
             $provider = TaskProviders::tryFrom($this->option('provider'));
 
-            /** @var TaskProviderService $providerService */
-            $providerService = app($provider->getService());
+            $providerService = $provider->getService();
             $tasks = $providerService->getTasks();
 
             foreach ($tasks as $taskData) {
@@ -44,8 +43,7 @@ class GetTasksFromProvidersCommand extends Command
 
         $providers = TaskProviders::cases();
         foreach ($providers as $provider) {
-            /** @var TaskProviderService $providerService */
-            $providerService = app($provider->getService());
+            $providerService = $provider->getService();
             $tasks = $providerService->getTasks();
 
             foreach ($tasks as $taskData) {

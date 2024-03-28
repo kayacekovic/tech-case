@@ -3,6 +3,7 @@
 namespace App\Enums;
 
 use App\Services\TaskProviders\JiraTaskProviderService;
+use App\Services\TaskProviders\TaskProviderServiceInterface;
 use App\Services\TaskProviders\TrelloTaskProviderService;
 
 enum TaskProviders: string
@@ -11,11 +12,13 @@ enum TaskProviders: string
 
     case TRELLO = 'trello';
 
-    public function getService(): string
+    public function getService(): TaskProviderServiceInterface
     {
-        return match ($this) {
+        $providerService = match ($this) {
             self::JIRA => JiraTaskProviderService::class,
             self::TRELLO => TrelloTaskProviderService::class,
         };
+
+        return app($providerService);
     }
 }

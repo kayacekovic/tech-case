@@ -7,7 +7,7 @@ use App\Enums\TaskProviders;
 use App\Enums\TaskStatuses;
 use Illuminate\Support\Collection;
 
-class JiraTaskProviderService extends TaskProviderService
+class JiraTaskProviderService implements TaskProviderServiceInterface
 {
     public function getTasks(): Collection
     {

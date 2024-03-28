@@ -7,7 +7,7 @@ use App\Enums\TaskProviders;
 use App\Enums\TaskStatuses;
 use Illuminate\Support\Collection;
 
-class TrelloTaskProviderService extends TaskProviderService
+class TrelloTaskProviderService implements TaskProviderServiceInterface
 {
     public function getTasks(): Collection
     {
