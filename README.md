@@ -29,6 +29,11 @@ php artisan migrate
 php artisan db:seed
 ````
 
+### To Run Tests
+```
+php artisan test
+```
+
 ## Get Tasks
 Run the following code to get tasks from provider(s).
 ```

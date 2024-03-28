@@ -4,7 +4,6 @@ namespace App\Console\Commands\Tasks;
 
 use App\Enums\TaskProviders;
 use App\Repositories\TaskRepository;
-use App\Services\TaskProviders\TaskProviderServiceInterface;
 use Illuminate\Console\Command;
 
 class GetTasksFromProvidersCommand extends Command
