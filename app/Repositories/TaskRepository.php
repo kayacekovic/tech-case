@@ -44,6 +44,7 @@ class TaskRepository
         return Task::query()
             ->whereNull('developer_id')
             ->orderByDesc('difficulty')
+            ->orderBy('duration')
             ->get();
     }
 
